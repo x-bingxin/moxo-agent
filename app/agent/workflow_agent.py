@@ -105,7 +105,7 @@ class WorkflowAgent:
                 "workflow": workflow,
             }
         except Exception as e:
-            return {"reply": f"修改工作流时发生错误：{e}", "workflow": session.workflow}
+            return {"reply": f"修改工作流时出错：{e}", "workflow": session.workflow}
 
     def _build_workflow(self, args: dict) -> dict:
         assignees = {}

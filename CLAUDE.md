@@ -8,43 +8,57 @@ Moxo Agent is an AI-powered workflow generator that uses LLM Function Calling to
 
 ## Development Commands
 
+This project uses [uv](https://docs.astral.sh/uv/) for dependency management. All commands should be run with `uv run` to use the project's virtual environment.
+
+### Setup
+```bash
+# Install all dependencies (including dev tools)
+uv sync --all-extras
+
+# Add a runtime dependency
+uv add <package>
+
+# Add a dev dependency
+uv add --dev <package>
+```
+
 ### Testing
 ```bash
 # Run all tests
-pytest
+uv run pytest
 
 # Run specific test file
-pytest tests/test_agent.py
+uv run pytest tests/test_agent.py
 
 # Run with verbose output
-pytest -v
+uv run pytest -v
 
-# Run with coverage (if pytest-cov installed)
-pytest --cov=app
+# Run with coverage
+uv run pytest --cov=app
 ```
 
 ### Running the Application
 ```bash
 # Start development server
-uvicorn app.main:app --reload --port 8000
+uv run uvicorn app.main:app --reload --port 8000
 
 # Production server
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
 ### Code Quality
 ```bash
 # Format code
-black app/ tests/
+uv run black app/ tests/
 
 # Sort imports
-isort app/ tests/
+uv run isort app/ tests/
 
 # Type checking
-mypy app/
+uv run mypy app/
 
 # Linting
-ruff check app/ tests/
+uv run ruff check app/ tests/
 ```
 
 ## Architecture
@@ -175,9 +189,9 @@ LLM_API_KEY=sk-...
 
 ## Common Issues
 
-**Import errors when running tests**: Ensure you're using the venv's pytest:
+**Import errors when running tests**: Always use `uv run pytest` to ensure the correct virtual environment is used:
 ```bash
-.venv/bin/python -m pytest
+uv run pytest
 ```
 
 **LLM client initialization in tests**: The `_get_agent()` function is lazy to allow mocking. Tests patch `app.api.chat._get_agent` before making requests.

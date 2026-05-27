@@ -4,9 +4,15 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Virtual environment
 .venv/
+
+# uv
+.python-version
 
 # Environment variables
 .env
@@ -15,6 +21,12 @@ build/
 .idea/
 .vscode/
 *.swp
+
+# Claude Code local state
+.claude/settings.local.json
+
+# Tool-generated docs
+docs/superpowers/
 
 # OS
 .DS_Store

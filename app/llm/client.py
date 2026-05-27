@@ -32,9 +32,13 @@ class LLMClient:
                 "model": self._model,
                 "messages": messages,
             }
+
             if tools:
                 kwargs["tools"] = tools
                 kwargs["tool_choice"] = "auto"
+
+            print("MESSAGES: ", messages)
+            print("TOOLS: ", tools)
 
             response = self._client.chat.completions.create(**kwargs)
             choice = response.choices[0]
