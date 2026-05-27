@@ -105,3 +105,34 @@ class TestActionRegistry:
                 return {}
 
         assert registry.get("deco_action") is DecoAction
+
+
+class TestConcreteActions:
+    def test_form_action_schema(self):
+        from app.actions.form_action import FormAction
+
+        schema = FormAction.custom_data_schema()
+        assert "properties" in schema
+        assert "fields" in schema["properties"]
+
+    def test_approval_action_schema(self):
+        from app.actions.approval_action import ApprovalAction
+
+        schema = ApprovalAction.custom_data_schema()
+        assert "properties" in schema
+        assert "approver_role" in schema["properties"]
+
+    def test_email_action_schema(self):
+        from app.actions.email_action import EmailAction
+
+        schema = EmailAction.custom_data_schema()
+        assert "properties" in schema
+        assert "subject" in schema["properties"]
+
+    def test_all_actions_registered(self):
+        from app.actions import registry
+
+        types = registry.list_types()
+        assert "form_action" in types
+        assert "approval_action" in types
+        assert "email_action" in types
