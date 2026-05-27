@@ -7,7 +7,11 @@
 ## 技术选型
 
 - **语言**：Python
-- **框架**：FastAPI
+- **Web 框架**：FastAPI
+- **AI 框架**：纯 OpenAI SDK（`openai` Python 包）
+  - DeepSeek 和通义千问均支持 OpenAI 兼容 API，只需配置 `base_url` 和 `api_key`
+  - 我们的场景是单步 LLM Function Calling，不需要 LangChain / LangGraph 等重量级框架
+  - 减少依赖，保持轻量，未来可按需引入
 - **LLM**：国产大模型（DeepSeek / 通义千问），要求支持 Function Calling
 - **输出格式**：JSON
 - **扩展机制**：类继承体系
@@ -217,6 +221,21 @@ class ActionRegistry:
 - **custom_data**：每种 action 特有的配置放在 `custom_data` 中，由 ActionRegistry 中对应类型的 schema 约束
 
 ## LLM 集成
+
+### 客户端
+
+使用 `openai` Python SDK，通过 OpenAI 兼容 API 调用国产大模型：
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.deepseek.com",  # 或通义千问的 endpoint
+    api_key="your-api-key"
+)
+```
+
+配置通过 `.env` 文件管理，支持运行时切换模型和 provider。
 
 ### Function Calling 工具
 
