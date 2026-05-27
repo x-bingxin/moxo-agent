@@ -72,15 +72,25 @@ uv run ruff check app/ tests/
 - Uses lazy initialization pattern for LLM client (initialized on first use)
 
 **Action Registry** (`app/actions/`)
-- Plugin-like system for action types (form, approval, email)
+- Plugin-like system for action types (form, approval, email, todo)
 - Each action inherits from `BaseAction` and defines `custom_data_schema()`
 - Actions registered at module load time in `app/actions/__init__.py`
 - Registry provides schemas to PromptBuilder for LLM tool definitions
 
 **PromptBuilder** (`app/agent/prompt_builder.py`)
 - Dynamically generates system prompts with all registered action schemas
-- Builds OpenAI function calling tool definitions
+- Builds OpenAI function calling tool definitions (`create_workflow` and `modify_workflow`)
+- `modify_workflow` supports four operation types: insert, delete, update, reorder
 - Injects existing workflow context for multi-turn modifications
+
+**LLM Client** (`app/llm/client.py`)
+- Thin wrapper around OpenAI SDK with `ToolCall` and `LLMResponse` dataclasses
+- Supports any OpenAI-compatible API via configurable `base_url`
+- All exceptions caught and re-raised as `RuntimeError` with Chinese message
+
+**Pydantic Models** (`app/models/`)
+- Defines `Assignee`, `AssigneeRef`, `ActionDefinition`, `ActionDependency`, `Workflow` models
+- These models exist for type documentation but are **not used in runtime code**—the agent/session layers pass workflow data as plain dicts
 
 **Session Management** (`app/agent/session.py`)
 - In-memory session storage (dict-based, no persistence)
@@ -127,18 +137,22 @@ def _get_agent() -> WorkflowAgent:
 
 Environment variables (`.env` file or shell):
 - `LLM_API_KEY`: Required for LLM calls
-- `LLM_BASE_URL`: OpenAI-compatible API endpoint (default: DeepSeek)
-- `LLM_MODEL`: Model name (default: deepseek-chat)
+- `LLM_BASE_URL`: OpenAI-compatible API endpoint (default: `https://api.deepseek.com`)
+- `LLM_MODEL`: Model name (default: `deepseek-chat`)
+- `SESSION_TIMEOUT_MINUTES`: Session idle timeout in minutes (default: 60, currently unused)
 
-Settings loaded via `pydantic-settings` in `app/config/settings.py`.
+Settings loaded via `pydantic-settings` in `app/config/settings.py`. See `.env.example` for a template.
 
 ## Testing Strategy
 
 Tests use FastAPI's `TestClient` and mock LLM responses:
 - `tests/test_agent.py`: Core workflow generation/modification logic
 - `tests/test_api.py`: HTTP endpoints with mocked agent
-- `tests/test_actions.py`: Action schema validation
+- `tests/test_actions.py`: Action schema validation and registry
 - `tests/test_llm_client.py`: LLM client wrapper with mocked OpenAI
+- `tests/test_models.py`: Pydantic model validation (Assignee, ActionDefinition, Workflow)
+- `tests/test_prompt_builder.py`: System prompt generation, tool definitions, message ordering
+- `tests/test_session.py`: Session and SessionManager lifecycle
 
 LLM calls are always mocked in tests—never make real API calls.
 
